@@ -70,3 +70,10 @@ $ node app
 ## License
 
 Public Domain
+
+
+# Tips on debugging under eclipse
+
+- `redis-server`
+- `node --debug app.js`
+- debug using chrome-dev tools

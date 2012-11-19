@@ -3,3 +3,4 @@ cantas
 public/stylesheets/*.css
 .gitignore
 *.html
+*.rdb
