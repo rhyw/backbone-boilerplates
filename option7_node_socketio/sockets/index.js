@@ -153,6 +153,7 @@
       });
 
       setUpCrudForModel('Todo', socket, hs);
+      setUpCrudForModel('Card', socket, hs);
     });
 
   };
