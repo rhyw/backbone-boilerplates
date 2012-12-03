@@ -6,13 +6,8 @@ $(function ($, _, Backbone, io) {
 
   socket = io.connect();
 
-  // Todo Model
-  // ----------
-
-  // Our basic **Todo** model has `title`, `order`, and `done` attributes.
   Card = Backbone.Model.extend({
 
-    // MongoDB uses _id as default primary key
     idAttribute: "_id",
 
     noIoBind: false,
@@ -216,7 +211,6 @@ $(function ($, _, Backbone, io) {
     // The DOM events specific to an item.
     events: {
       "click .toggle"   : "toggleDone",
-      "click .add-card": "cardAdd",
       "dblclick .view"  : "edit",
       "click a.destroy" : "clear",
       "keypress .edit"  : "updateOnEnter",
@@ -247,9 +241,6 @@ $(function ($, _, Backbone, io) {
     },
 
     // Toggle the `"done"` state of the model.
-    cardAdd: function () {
-      console.log('click triggerd');
-    },
 
     // Switch this view into `"editing"` mode, displaying the input field.
     edit: function () {
@@ -318,6 +309,7 @@ $(function ($, _, Backbone, io) {
     // Delegated events for creating new items, and clearing completed ones.
     events: {
       "keypress #add-card":  "createOnEnter",
+      "click .add-card": "cardAdd",
     },
 
     // At initialization we bind to the relevant events on the `Todos`
@@ -361,6 +353,11 @@ $(function ($, _, Backbone, io) {
         this.main.hide();
       }
     },
+
+    cardAdd: function () {
+      console.log('click triggerd');
+    },
+
 
     addOne: function (card) {
       var view = new CardView({model: card});
