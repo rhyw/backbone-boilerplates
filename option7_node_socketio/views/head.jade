@@ -1,0 +1,31 @@
+header#eso-topbar
+    a(href="/" title="Goto Homepage").logo Cantas
+    a(href="https://engineering.redhat.com/hss-portal).eso-logo Developed by HSS
+    ul.quick-menu.unstyled
+      li.dropdown
+        a(href="https://engineering.redhat.com/hss-portal/products/", title="Engineering Services") Engineering Services
+        li.dropdown.header-help
+          a(href="#", title="User guide", data-toggle="dropdown").dropdown-toggle Help
+            b.caret
+            ul.dropdown-menu
+              li
+                a(href="aboutus.html") User Guide
+                li.divider
+                li
+                  a(href="#") Report Bug
+                li
+                  a(href="mailto:hss-ied-list@redhat.com") Contact Developers
+                li.divider
+                li
+                  a(href="mailto:hss-eip@redhat.com") EIP Request
+                li
+                  a(href="mailto:eng-ops@redhat.com") Eng-ops Request
+                li
+                  a(href="mailto:ied@redhat.com") Application Developers
+        li.dropdown.header-user
+          a(data-toggle="dropdown", href="#", title="User Info").dropdown-toggle llim
+            b.caret
+            ul.dropdown-menu
+              li
+                a(href="#") Profile
+   input(type="text", placeholder="search" onclick="this.value='').quick-search
