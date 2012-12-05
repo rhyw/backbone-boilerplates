@@ -180,30 +180,25 @@ $(function ($, _, Backbone, io) {
       return this.without.apply(this, this.status());
     },
 
-    // We keep the Todos in sequential order, despite being saved by unordered
-    // GUID in the database. This generates the next order number for new items.
     nextOrder: function () {
       if (!this.length) { return 1; }
       return this.last().get('order') + 1;
     },
 
-    // Cards are sorted by their original insertion order.
     comparator: function (card) {
       return card.get('order');
     }
 
   });
 
-  // Create our global collection of **Todos**.
   Cards = new CardList();
 
   // Todo Item View
   // --------------
 
-  // The DOM element for a todo item...
   CardView = Backbone.View.extend({
 
-    tagName:  "p",
+    tagName:  "div",
 
     // Cache the template function for a single item.
     template: _.template($('#card-entry').html()),
@@ -217,9 +212,6 @@ $(function ($, _, Backbone, io) {
       "blur .edit"      : "close"
     },
 
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
     initialize: function () {
       this.model.on('change', this.render, this);
       this.model.on('lock', this.serverLock, this);
@@ -227,10 +219,9 @@ $(function ($, _, Backbone, io) {
       Cards.on('remove', this.serverDelete, this);
     },
 
-    // Re-render the titles of the todo item.
     render: function () {
       this.$el.html(this.template(this.model.toJSON()));
-      this.$el.toggleClass('done', this.model.get('status'));
+      // this.$el.toggleClass('done', this.model.get('status'));
       this.input = this.$('.edit');
       return this;
     },
@@ -239,8 +230,6 @@ $(function ($, _, Backbone, io) {
     toggleDone: function () {
       this.model.toggle();
     },
-
-    // Toggle the `"done"` state of the model.
 
     // Switch this view into `"editing"` mode, displaying the input field.
     edit: function () {
@@ -262,14 +251,12 @@ $(function ($, _, Backbone, io) {
       this.model.unlock();
     },
 
-    // If you hit `enter`, we're through editing the item.
     updateOnEnter: function (e) {
       if (e.keyCode === 13) {
         this.close();
       }
     },
 
-    // Remove the item, destroy the model.
     clear: function () {
       if (!this.model.locked) {
         this.model.clear();
@@ -355,13 +342,17 @@ $(function ($, _, Backbone, io) {
     },
 
     cardAdd: function () {
-      console.log('click triggerd');
+      this.addOne();
     },
 
 
     addOne: function (card) {
       var view = new CardView({model: card});
       $("#card-list").append(view.render().el);
+    },
+
+    addAll: function () {
+      Cards.each(this.addOne);
     },
 
     // If you hit return in the main input field, create new **Todo** model

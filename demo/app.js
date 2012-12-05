@@ -33,7 +33,7 @@ app.configure('development', function () {
 });
 
 routes.init(app);
-mongoose.connect("127.0.0.1", "todomvc", 27017);
+mongoose.connect("127.0.0.1", "cantas", 27017);
 
 app.listen(3000);
 

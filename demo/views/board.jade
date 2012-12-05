@@ -5,31 +5,10 @@ div.content.clearfix
         .overview
           .structure-container
             .horizen-sroll.clearfix
-              #card-list.list-panel.droptrue.move.ui-sortable
+              #card-list-header.list-panel.droptrue.move.ui-sortable
                 header.class1
                   h4 List Title
-                .checkcontainer
-                  .checklist.clearfix
-                    div Art work for P360
-                .checkcontainer
-                  .checklist.clearfix
-                    div Authenticity prototype
-                .checkcontainer
-                  div.checklist.clearfix
-                    div Cantas prototype
-                p.add-plugein.add-card Add card
-              .list-panel.droptrue.move.ui-sortable
-                header.class1
-                  h4 List Title
-                .checkcontainer
-                  .checklist.clearfix
-                    div Art work for P360
-                .checkcontainer
-                  .checklist.clearfix
-                    div Authenticity prototype
-                .checkcontainer
-                  div.checklist.clearfix
-                    Cantas prototype
+                #card-list
                 p.add-plugein.add-card Add card
           .scrollbar
             .track
@@ -37,9 +16,9 @@ div.content.clearfix
                 .end
 
 script#card-entry(type="text/template")
-  |<div class="checkcontainer>
+  |<div class="checkcontainer">
   |  <div class="checklist clearfix">
-  |    <div><%= title %></div>
+  |    <div><%= title %> - <%= status%></div>
   |  </div>
   |</div>
 
