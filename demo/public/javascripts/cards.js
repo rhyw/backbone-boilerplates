@@ -292,11 +292,14 @@ $(function ($, _, Backbone, io) {
     // Instead of generating a new element, bind to the existing skeleton of
     // the App already present in the HTML.
     el: $("#content"),
+    btnAddCard: $("#btn-add-card"),
 
     // Delegated events for creating new items, and clearing completed ones.
     events: {
-      "keypress #add-card":  "createOnEnter",
-      "click .add-card": "cardAdd",
+      "click #add-card":  "createCard",
+      "click .add-card": "showAddCard",
+      "click .option-cancel": "cancelAddCard",
+      "click .btn-submit": "addOne",
     },
 
     // At initialization we bind to the relevant events on the `Todos`
@@ -304,7 +307,7 @@ $(function ($, _, Backbone, io) {
     // loading any preexisting todos.
     initialize: function (initalData) {
 
-      this.input = this.$("#add-card");
+      this.input = this.$("#add-card-form");
 
       Cards.on('add', this.addOne, this);
       Cards.on('reset', this.addAll, this);
@@ -341,10 +344,15 @@ $(function ($, _, Backbone, io) {
       }
     },
 
-    cardAdd: function () {
-      this.addOne();
+    showAddCard: function () {
+      this.btnAddCard.hide();
+      this.input.show();
     },
 
+    cancelAddCard: function () {
+      this.input.hide();
+      this.btnAddCard.show();
+    },
 
     addOne: function (card) {
       var view = new CardView({model: card});
@@ -356,14 +364,10 @@ $(function ($, _, Backbone, io) {
     },
 
     // If you hit return in the main input field, create new **Todo** model
-    createOnEnter: function (e) {
-      if (e.keyCode !== 13) { return; }
-      if (!this.input.val()) { return; }
+    createCard: function (e) {
 
-      var t = new Card({title: this.input.val()});
-      t.save();
-
-      this.input.val('');
+      var c = new Card({title: this.input.find('textarea').val()});
+      c.save();
     },
 
   });
