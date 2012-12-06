@@ -9,16 +9,12 @@ $(function ($, _, Backbone, io) {
   Card = Backbone.Model.extend({
 
     idAttribute: "_id",
-
     noIoBind: false,
-
     socket: socket,
-
     url: function () {
       return "/card" + ((this.id) ? '/' + this.id : '');
     },
 
-    // Default attributes for the todo item.
     defaults: function () {
       return {
         title: "empty title...",
@@ -27,7 +23,6 @@ $(function ($, _, Backbone, io) {
       };
     },
 
-    // Ensure that each todo created has `title`.
     initialize: function () {
       if (!this.get("title")) {
         this.set({"title": this.defaults.title});
@@ -38,17 +33,10 @@ $(function ($, _, Backbone, io) {
       if (!this.noIoBind) {
         this.ioBind('update', this.serverChange, this);
         this.ioBind('delete', this.serverDelete, this);
-        this.ioBind('lock', this.serverLock, this);
-        this.ioBind('unlock', this.serverUnlock, this);
       }
     },
 
-    // Toggle the `done` state of this todo item.
-    toggle: function () {
-      this.save({status: !this.get("status")});
-    },
-
-    // Remove this Todo and delete its view.
+    // Remove this Card and delete its view.
     clear: function (options) {
       this.destroy(options);
       this.modelCleanup();
@@ -67,19 +55,6 @@ $(function ($, _, Backbone, io) {
       }
     },
 
-    serverLock: function (success) {
-      if (success) {
-        this.locked = true;
-        //this.trigger('lock', this);
-      }
-    },
-
-    serverUnlock: function (success) {
-      if (success) {
-        this.locked = false;
-      }
-    },
-
     modelCleanup: function () {
       this.ioUnbindAll();
       return this;
@@ -87,51 +62,14 @@ $(function ($, _, Backbone, io) {
 
     locked: false,
 
-    lock: function (options) {
-      if (!this._locked) {
-        options = options ? _.clone(options) : {};
-        var model = this
-          , success = options.success;
-        options.success = function (resp, status, xhr) {
-          model.locked = true;
-          if (success) {
-            success(model, resp);
-          } else {
-            model.trigger('lock', model, resp, options);
-          }
-        };
-        options.error = Backbone.wrapError(options.error, model, options);
-        return (this.sync || Backbone.sync).call(this, 'lock', this, options);
-      }
-    },
-
-    unlock: function (options) {
-      if (this.locked) {
-        options = options ? _.clone(options) : {};
-        var model = this
-          , success = options.success;
-        options.success = function (resp, status, xhr) {
-          model._locked = false;
-          if (success) {
-            success(model, resp);
-          } else {
-            model.trigger('unlock', model, resp, options);
-          }
-        };
-        options.error = Backbone.wrapError(options.error, model, options);
-        return (this.sync || Backbone.sync).call(this, 'unlock', this, options);
-      }
-    }
   });
 
-  // Todo Collection
+  // Card Collection
   // ---------------
 
   CardList = Backbone.Collection.extend({
 
-    // Reference to this collection's model.
     model: Card,
-
     socket: socket,
 
     // Returns the relative URL where the model's resource would be
@@ -176,10 +114,6 @@ $(function ($, _, Backbone, io) {
     },
 
     // Filter down the list to only todo items that are still not finished.
-    remaining: function () {
-      return this.without.apply(this, this.status());
-    },
-
     nextOrder: function () {
       if (!this.length) { return 1; }
       return this.last().get('order') + 1;
@@ -193,7 +127,7 @@ $(function ($, _, Backbone, io) {
 
   Cards = new CardList();
 
-  // Todo Item View
+  // Card Item View
   // --------------
 
   CardView = Backbone.View.extend({
@@ -205,7 +139,6 @@ $(function ($, _, Backbone, io) {
 
     // The DOM events specific to an item.
     events: {
-      "click .toggle"   : "toggleDone",
       "dblclick .view"  : "edit",
       "click a.destroy" : "clear",
       "keypress .edit"  : "updateOnEnter",
@@ -214,21 +147,13 @@ $(function ($, _, Backbone, io) {
 
     initialize: function () {
       this.model.on('change', this.render, this);
-      this.model.on('lock', this.serverLock, this);
-      this.model.on('unlock', this.serverUnlock, this);
       Cards.on('remove', this.serverDelete, this);
     },
 
     render: function () {
       this.$el.html(this.template(this.model.toJSON()));
-      // this.$el.toggleClass('done', this.model.get('status'));
       this.input = this.$('.edit');
       return this;
-    },
-
-    // Toggle the `"done"` state of the model.
-    toggleDone: function () {
-      this.model.toggle();
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
@@ -270,17 +195,6 @@ $(function ($, _, Backbone, io) {
       }
     },
 
-    serverLock: function () {
-      if (!this.$el.hasClass("editing") && this.model.locked) {
-        this.$el.addClass('locked');
-        this.$('.toggle').attr('disabled', true);
-      }
-    },
-
-    serverUnlock: function () {
-      this.$el.removeClass('locked');
-      this.$('.toggle').attr('disabled', false);
-    }
   });
 
   // The Application
@@ -302,7 +216,7 @@ $(function ($, _, Backbone, io) {
       "click .btn-submit": "addOne",
     },
 
-    // At initialization we bind to the relevant events on the `Todos`
+    // At initialization we bind to the relevant events on the `Cards`
     // collection, when items are added or changed. Kick things off by
     // loading any preexisting todos.
     initialize: function (initalData) {
@@ -334,9 +248,6 @@ $(function ($, _, Backbone, io) {
     // Re-rendering the App just means refreshing the statistics -- the rest
     // of the app doesn't change.
     render: function () {
-      var done = Cards.length,
-        remaining = Cards.length;
-
       if (Cards.length) {
         this.main.show();
       } else {
@@ -363,11 +274,11 @@ $(function ($, _, Backbone, io) {
       Cards.each(this.addOne);
     },
 
-    // If you hit return in the main input field, create new **Todo** model
-    createCard: function (e) {
-
+    createCard: function () {
       var c = new Card({title: this.input.find('textarea').val()});
       c.save();
+      // clear the textarea
+      this.input.find('textarea').val('');
     },
 
   });

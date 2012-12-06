@@ -36,6 +36,7 @@ routes.init(app);
 mongoose.connect("127.0.0.1", "cantas", 27017);
 
 app.listen(3000);
+// app.listen(3000, '0.0.0.0');
 
 sio = require('socket.io').listen(app);
 sockets.init(sio, sessionStore);
