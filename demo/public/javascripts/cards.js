@@ -183,9 +183,7 @@ $(function ($, _, Backbone, io) {
     },
 
     clear: function () {
-      if (!this.model.locked) {
-        this.model.clear();
-      }
+      this.model.clear();
     },
 
     serverDelete: function (data) {
